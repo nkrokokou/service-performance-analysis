@@ -14,7 +14,8 @@ service-performance-analysis/
 ├── notebook/
 │   └── analyse_performance_services.ipynb      # Notebook Jupyter exécuté de bout en bout
 ├── data/
-│   └── P-DA_Data_Analyst_Practical_Case_Dataset.xlsx # Jeu de données source (autonome)
+│   ├── P-DA_Data_Analyst_Practical_Case_Dataset.xlsx # Jeu de données source (autonome)
+│   └── P-DA_Data_Analyst_Cleaned.csv           # Jeu de données nettoyé et validé
 └── outputs/                                     # Export des visualisations graphiques
     ├── evolution_temporelle.png
     └── comparaison_services_regions.png
@@ -54,19 +55,26 @@ Le jeu de données présentait 5 catégories d'anomalies majeures identifiées l
 | **Doublons Stricts** | 10 lignes strictement identiques | Suppression via `drop_duplicates()` | Volumétrie ramenée de **220 à 210 lignes uniques** (surévaluation initiale de 4.5%). |
 | **Date Invalide** | Formats mixtes + date impossible `'31/02/2026'` | Remplacement de `'31/02/2026'` par `'2026-02-28'` + conversion ISO `pd.to_datetime()` | Le 31 février n'existe pas. Convertir au 28 février préserve la ligne sans créer de `NaN`. |
 | **Flux de Demandes** | $\text{Demandes reçues} \neq \text{Abouties} + \text{Échecs}$ | Recalcul strict : $\text{Reçues} = \text{Abouties} + \text{Échecs}$ | Les demandes abouties et échecs proviennent de comptages physiques. Corrige les reçues négatives (-25), l'aberration (25000) et les 0. |
+| **Imputation Catégorielles** | `Région` (2 NaN), `Canal` (2 NaN) | Imputation prioritaire par le mode conditionnel selon le `Service` | Effectuée avant agrégations pour éviter l'omission de lignes dans les groupby (210 lignes conservées). |
 | **Délai Moyen (sec)** | Délais = 0 s, 3600 s ou `NaN` | Imputation par la médiane conditionnelle par `(Service, Canal)` | Élimine les impossibilités (0s) et les erreurs de saisie/timeout (3600s = 1h pile). |
-| **Catégoriques** | `Région` (2 NaN), `Canal` (2 NaN) | Imputation par le mode conditionnel selon le `Service` | Conserve l'intégrité catégorielle par type de service sans supprimer de lignes. |
 
 ---
 
 ## Indicateurs Clés et Visualisations
 
-### Indicateurs Généraux Post-Nettoyage
-* **Volume total de demandes reçues** : **65 422 demandes**
-* **Demandes abouties** : **54 744 demandes**
-* **Échecs** : **10 678 demandes**
-* **Taux de réussite global** : **83,68 %**
-* **Délai moyen de traitement** : **113,8 secondes** (~1 min 54 s)
+### Indicateurs Généraux Post-Nettoyage (210 Opérations Uniques)
+* **Volume total de demandes reçues** : **65 917 demandes**
+* **Demandes abouties** : **55 328 demandes**
+* **Échecs** : **10 589 demandes**
+* **Taux de réussite global** : **83,94 %**
+* **Délai moyen de traitement** : **99,3 secondes** (~1 min 39 s)
+
+### Breakdown par Canal de Distribution
+| Canal | Volume Reçues | Demandes Abouties | Échecs | Taux de Réussite (%) | Délai Moyen (sec) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Web** | 33 651 | 27 884 | 5 767 | **82,86 %** | **96,8 s** |
+| **Mobile** | 25 598 | 21 992 | 3 606 | **85,91 %** | **101,8 s** |
+| **Guichet assisté** | 6 668 | 5 452 | 1 216 | **81,76 %** | **100,5 s** |
 
 ### Visualisation 1 : Évolution Temporelle Mensuelle
 ![Évolution Temporelle](outputs/evolution_temporelle.png)
@@ -78,17 +86,17 @@ Le jeu de données présentait 5 catégories d'anomalies majeures identifiées l
 
 ## Insights Clés et Recommandations Actionnables
 
-### 1. Dominance du Canal Web et Performance Digitale Exceptionnelle
-* **Constat Chiffré** : Le canal **Web** capte **47,6% du volume total de demandes** (31 161 / 65 422) avec le taux de réussite le plus élevé (**85,24%**) et le délai moyen le plus court (**93,1 secondes**).
-* **Analyse** : Le Web est le canal le plus efficient et le plus plébiscité par les usagers.
-* **Piste d'action** : Accélérer la dématérialisation des procédures papier et diriger l'accueil physique vers le portail en ligne avec une FAQ dynamique.
+### 1. Dominance du Canal Web et Adoption Digitale
+* **Constat Chiffré** : Le canal **Web** concentre **51,1% du volume total de demandes** (33 651 / 65 917) avec un délai de traitement très performant (**96,8 secondes**).
+* **Analyse** : Le Web est le canal prédominant et le plus rapide pour la prise en charge des flux d'usagers.
+* **Piste d'action** : Poursuivre la dématérialisation des démarches administratives physiques et renforcer les serveurs pour absorber la charge.
 
-### 2. Goulot d'Étranglement sur le Canal "Guichet Assisté"
-* **Constat Chiffré** : Le **Guichet assisté** affiche le taux de réussite le plus faible (**78,14%**) et le délai de traitement le plus élevé (**126,8 secondes**, soit **+36,2% par rapport au Web**).
-* **Analyse** : Les usagers en guichet font face à des temps d'attente importants et à un taux d’échec supérieur (21,86%), principalement lié à des pièces justificatives manquantes.
-* **Piste d'action** : Implémenter un système de pré-verification numérique des dossiers avant la prise de rendez-vous en agence.
+### 2. Excellence de la Performance du Canal Mobile
+* **Constat Chiffré** : Le canal **Mobile** enregistre le taux de réussite le plus élevé de l'organisation à **85,91%** sur un volume de 25 598 demandes (38,8% du volume global).
+* **Analyse** : Les parcours simplifiés sur smartphone maximisent la complétude des dossiers.
+* **Piste d'action** : Étendre l'offre de téléprocédures sur l'application mobile et ajouter un système d'alertes par notification push.
 
-### 3. Disparité de Performance du Service "Prise de rendez-vous"
-* **Constat Chiffré** : Le service **Prise de rendez-vous** enregistre le taux de réussite le plus faible (**80,4%**), en comparaison avec **87,1%** pour le *Paiement de redevance*.
-* **Analyse** : Le taux d'aboutissement est dégardé par les non-présentations (no-shows) et les annulations tardives de créneaux.
-* **Piste d'action** : Mettre en place des rappels SMS automatisés H-24 avec confirmation ou annulation rapide pour réattribuer immédiatement les créneaux vacants.
+### 3. Goulot d'Étranglement et Échecs en Guichet Assisté
+* **Constat Chiffré** : Le **Guichet assisté** enregistre le taux d'aboutissement le plus bas à **81,76%** avec 18,24% d'échecs (1 216 échecs sur 6 668 demandes).
+* **Analyse** : Le guichet physique concentre les dossiers complexes ou incomplets nécessitant un accompagnement.
+* **Piste d'action** : Implémenter un pré-contrôle numérique des pièces justificatives avant la venue de l'usager en agence.
