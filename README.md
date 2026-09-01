@@ -1,7 +1,7 @@
 # 📊 Analyse de Performance des Services Numériques (`service-performance-analysis`)
 
-> **Contexte du cas pratique**  
-> Analyse exploratoire, audit et nettoyage d'un jeu de données opérationnel de **220 lignes** retraçant l'activité des services publics (volumes, aboutissements, échecs, délais). L'objectif est d'évaluer la performance par canal, région et période afin de formuler des préconisations stratégiques.
+> **Contexte du projet**  
+> Analyse exploratoire, audit et nettoyage d'un jeu de données opérationnel de **220 lignes** retraçant l'activité des services publics (volumes de demandes, aboutissements, échecs, délais). L'objectif est d'évaluer la performance par canal, région et période afin de formuler des préconisations stratégiques d'optimisation des services.
 
 ---
 
@@ -29,9 +29,9 @@ service-performance-analysis/
 # Se placer à la racine du projet
 cd service-performance-analysis
 
-# (Optionnel) Créer et activer un environnement virtuel
+# Créer et activer un environnement virtuel
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+source .venv/bin/activate  # Sur Windows: .venv\Scripts\activate
 
 # Installer les packages requis
 pip install -r requirements.txt
@@ -41,9 +41,6 @@ pip install -r requirements.txt
 ```bash
 # Lancer l'interface Jupyter Notebook
 jupyter notebook notebook/analyse_performance_services.ipynb
-
-# Ou ré-exécuter le notebook en ligne de commande :
-jupyter nbconvert --to notebook --execute --inplace notebook/analyse_performance_services.ipynb
 ```
 
 ---
@@ -93,21 +90,5 @@ Le jeu de données présentait 5 catégories d'anomalies majeures identifiées l
 
 ### 3. 📉 Disparité de Performance du Service "Prise de rendez-vous"
 * **Constat Chiffré** : Le service **Prise de rendez-vous** enregistre le taux de réussite le plus faible (**80,4%**), en comparaison avec **87,1%** pour le *Paiement de redevance*.
-* **Analyse** : Le taux d'aboutissement est dégradé par les non-présentations (no-shows) et les annulations tardives de créneaux.
+* **Analyse** : Le taux d'aboutissement est dégardé par les non-présentations (no-shows) et les annulations tardives de créneaux.
 * **Piste d'action** : Mettre en place des rappels SMS automatisés H-24 avec confirmation ou annulation rapide pour réattribuer immédiatement les créneaux vacants.
-
----
-
-## 💻 Instructions pour le Push GitHub
-
-Si le dépôt vide a été créé sur votre compte GitHub (`github.com/nkrokokou/service-performance-analysis`), voici les commandes terminal exécutées :
-
-```powershell
-cd C:\dev\data
-git init
-git add .
-git commit -m "Analyse performance des services numériques - test pratique"
-git branch -M main
-git remote add origin https://github.com/nkrokokou/service-performance-analysis.git
-git push -u origin main
-```
